@@ -6,26 +6,14 @@ BAUD_ARRAY = [110, 150, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 1
 
 $serialport = SerialPort.new ADRESS.to_s
 Shoes.app title: 'RSerial', width: 700, height: 500 do
-	Thread.new do
-		loop do
-			@message = $serialport.read
-			unless @message.empty? 
-			  @messages.append do
-			 	  stack width: 200, margin: 250 do
-				 	  para fg @message, whitesmoke
-			    end
-			  end
-		  end
-		end
-	end
   background dimgray
   flow do
     @contol = stack margin: 20, width: 250 do
   	  caption fg 'Write your message', whitesmoke
-  	  @text_box = edit_box
+  	  @text_box = edit_line
   	  button 'Send message' do
   	    unless @text_box.text.empty?
-  	      @messages.append do
+  	      $messages.append do
 		 	    	stack width: 200 do
 			 	  		para fg @text_box.text, whitesmoke 
 		  	 	  end
@@ -38,6 +26,18 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
         $serialport.set_baud_rate(list.text.to_i)
       end 
     end
-    @messages = stack(margin: 5, width: 445){ border gray } 
+    $messages = stack(margin: 5, width: 445){ border gray } 
   end
+  Thread.new do
+		loop do
+			@message = $serialport.read 250
+			unless @message.empty?
+			  $messages.append do
+			 	  stack width: 200, margin_left: 250 do
+				 	  para fg @message, whitesmoke
+			    end
+			  end
+		  end
+		end
+	end
 end
