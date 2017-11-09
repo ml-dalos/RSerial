@@ -11,13 +11,13 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
   flow do
     @contol = stack margin: 20, width: 250 do
     	inscription fg "Port adress: #{ADRESS}", whitesmoke
-  	  caption fg 'Write your message', whitesmoke
+    	caption fg 'Write your message', whitesmoke
   	  @text_box = edit_line
   	  button 'Send message' do
   	    unless @text_box.text.empty?
   	      $messages.append do
 		 	    	stack width: 200 do
-			 	  		para fg @text_box.text, whitesmoke 
+		 	    		para fg @text_box.text, whitesmoke 
 		  	 	  end
 	  	 	  end
 	  	 	  serialport.write(@text_box.text)
@@ -32,7 +32,7 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
   end
   Thread.new do
 		loop do
-			@message = serialport.read
+			@message = serialport.read(1)
 			unless @message.empty?
 			  $messages.append do
 			 	  stack width: 200, margin_left: 250 do

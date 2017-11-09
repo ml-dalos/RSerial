@@ -16,7 +16,7 @@ class SerialPort < Serial
   	data.each_byte do |byte|
       attemps = 0  
       loop do
-     	  super byte
+     	  super byte.chr
   	    sleep 0.1
   	    if collide?
   	    	super JAM_SIGNAL 
@@ -29,9 +29,11 @@ class SerialPort < Serial
     end
   end
 
-  def read 
-    loop do
-    	case byte = getbyte
+  def read size
+  	message = nil
+  	loop do
+    	byte = super
+    	case byte
       when nil
         return message
       when JAM_SIGNAL
@@ -40,7 +42,7 @@ class SerialPort < Serial
         message += byte
       end    
     end
-
+    message
   end
 
   def set_baud_rate baud_rate
@@ -48,7 +50,6 @@ class SerialPort < Serial
   end
   
   private
-
   def wait_chanel_free
   	sleep(DELAY_SECONDS) if time_odd?
   end
@@ -64,7 +65,6 @@ class SerialPort < Serial
   end
 
   def delay_write attemp
-  	sleep(rand([10, attemp].min ** 2) * 10)
+  	sleep(rand([10, attemp].min ** 2) / 100)
   end
-
 end
