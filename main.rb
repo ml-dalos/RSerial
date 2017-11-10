@@ -27,7 +27,7 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
         serialport.set_baud_rate(list.text.to_i)
       end
       para fg "Debugger", whitesmoke
-      $debugger = stack(margin: 5, width: 240){ } 
+      $debugger = stack(margin: 5, width: 230){ } 
     end
     $messages = stack(margin: 5, width: 445){ border gray } 
   end
