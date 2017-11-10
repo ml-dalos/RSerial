@@ -1,7 +1,8 @@
 require 'rubyserial'
 
-class SerialPort < Serial
-	
+class Port < Serial
+
+	BAUD_ARRAY = [110, 150, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 	DELAY_SECONDS = 1
 	JAM_SIGNAL = '~'
 	END_SIGNAL = '}' 
@@ -28,20 +29,15 @@ class SerialPort < Serial
   	    end 
       end
     end
+    puts
     super END_SIGNAL
   end
 
   def set_baud_rate baud_rate
-    this = SerialPort.new @adress, baud_rate
-  end
-  
-  def busy?
-  	@busy
+    this = Port.new @adress, baud_rate
   end
    
   private
-
-
   def wait_chanel_free
   	sleep(DELAY_SECONDS) if time_odd?
   end

@@ -2,9 +2,8 @@ require 'green_shoes'
 require_relative 'port'
 
 ADRESS = ENV['PORT']
-BAUD_ARRAY = [110, 150, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
-serialport = SerialPort.new ADRESS.to_s
+serialport = Port.new ADRESS.to_s
 
 Shoes.app title: 'RSerial', width: 700, height: 500 do
   background dimgray
@@ -24,15 +23,11 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
 	  		  @text_box.text = ''
 	  	  end
   		end
-  		list_box items: BAUD_ARRAY, choose: 9600 do |list|
+  		list_box items: Port::BAUD_ARRAY, choose: 9600 do |list|
         serialport.set_baud_rate(list.text.to_i)
       end
-      button 'Exit' do
-        serialport.close
-        exit
-      end
       para fg "Debugger", whitesmoke
-      $debugger = stack(margin: 5, width: 240){ border gray } 
+      $debugger = stack(margin: 5, width: 240){ } 
     end
     $messages = stack(margin: 5, width: 445){ border gray } 
   end
@@ -42,8 +37,9 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
   	loop do
   		byte = serialport.read 1
   		debug_message << byte
-			if byte == '}'
-				$debugger.append do
+			if byte == Port::END_SIGNAL
+				$debugger.clear do
+          border gray
 				  stack width: 240 do
 		        para fg debug_message, lightyellow
 		      end
@@ -55,7 +51,7 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
 	      end
 	      debug_message = ''
 				message = '' 
-			elsif byte == '~'
+			elsif byte == Port::JAM_SIGNAL
 				message.chop!	
 			else
 				message << byte	
