@@ -26,20 +26,40 @@ Shoes.app title: 'RSerial', width: 700, height: 500 do
   		end
   		list_box items: BAUD_ARRAY, choose: 9600 do |list|
         serialport.set_baud_rate(list.text.to_i)
-      end 
+      end
+      button 'Exit' do
+        serialport.close
+        exit
+      end
+      para fg "Debugger", whitesmoke
+      $debugger = stack(margin: 5, width: 240){ border gray } 
     end
     $messages = stack(margin: 5, width: 445){ border gray } 
   end
   Thread.new do
-		loop do
-			@message = serialport.read(1)
-			unless @message.empty?
-			  $messages.append do
-			 	  stack width: 200, margin_left: 250 do
-				 	  para fg @message, lightyellow
-			    end
-			  end
-		  end
-		end
+  	message = ''
+  	debug_message = ''
+  	loop do
+  		byte = serialport.read 1
+  		debug_message << byte
+			if byte == '}'
+				$debugger.append do
+				  stack width: 240 do
+		        para fg debug_message, lightyellow
+		      end
+	      end 
+				$messages.append do
+      	  stack width: 200, margin_left: 250 do
+		        para fg message, lightyellow
+		      end
+	      end
+	      debug_message = ''
+				message = '' 
+			elsif byte == '~'
+				message.chop!	
+			else
+				message << byte	
+	    end
+	  end
 	end
 end

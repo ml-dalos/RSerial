@@ -4,6 +4,7 @@ class SerialPort < Serial
 	
 	DELAY_SECONDS = 1
 	JAM_SIGNAL = '~'
+	END_SIGNAL = '}' 
 	attr_reader :adress
 	
 	def initialize adress ,baude_rate=9600, data_bits=8, parity=:none 
@@ -12,7 +13,7 @@ class SerialPort < Serial
   end
 
   def write data
-    wait_chanel_free
+  	wait_chanel_free
   	data.each_byte do |byte|
       attemps = 0  
       loop do
@@ -27,29 +28,20 @@ class SerialPort < Serial
   	    end 
       end
     end
-  end
-
-  def read size
-  	message = nil
-  	loop do
-    	byte = super
-    	case byte
-      when nil
-        return message
-      when JAM_SIGNAL
-        message.chop!
-      else
-        message += byte
-      end    
-    end
-    message
+    super END_SIGNAL
   end
 
   def set_baud_rate baud_rate
     this = SerialPort.new @adress, baud_rate
   end
   
+  def busy?
+  	@busy
+  end
+   
   private
+
+
   def wait_chanel_free
   	sleep(DELAY_SECONDS) if time_odd?
   end
